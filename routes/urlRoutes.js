@@ -48,4 +48,130 @@ router.post("/shorten", async(req, res)=>{
     }
 });
 
+
+//GET  /shorten/:shortCode
+router.get("/shorten/:shortCode", async (req, res) => {
+    try {
+        const {shortCode} = req.params;
+
+        //1. Find URL by shortCode
+        const urlData = await Url.findOne({shortCode});
+
+        //2. If not found 
+        if(!urlData){
+            return res.status(404).json({
+                error:"Short URL not found"
+            });
+        }
+
+        //3. If found, return data
+        res.status(200).json({
+            id: urlData._id,
+            url: urlData.url,
+            shortCode: urlData.shortCode,
+            createdAt: urlData.createdAt,
+            updatedAt: urlData.updatedAt
+        });
+    } catch (error) {
+        res.status(500).json({
+            error:"Internal Server Error"
+        });
+    }
+});
+
+//PUT /shorten/:shortCode
+
+router.put("/shorten/:shortCode", async(req, res) => {
+    try {
+        const {shortCode} = req.params;
+        const {url} = req.body;
+
+        //1. Validate input
+        if(!url){
+            return res.status(400).json({
+                error:"URL is required"
+            });
+        }
+
+        //2. Find and update
+        const updatedUrl = await Url.findOneAndUpdate(
+            {shortCode},
+            {url},
+            {new:true} //return updated document
+        );
+
+        //3. Not Found
+        if(!updatedUrl){
+            return res.status(404).json({
+                error:"Short URL not found"
+            });
+        }
+
+        //4. Success respone
+        res.status(200).json({
+            id: updatedUrl._id,
+            url: updatedUrl.url,
+            shortCode: updatedUrl.shortCode,
+            createdAt: updatedUrl.createdAt,
+            updatedAt: updatedUrl.updatedUrl
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: "Internal Server Error"
+        });
+    }
+});
+
+//DELETE /shorten/:shortCode
+router.delete("/shorten/:shortCode", async(req, res) =>{
+    try {
+        const {shortCode} = req.params;
+
+        //1. Delete By ShortCode
+        const deletedUrl = await Url.findOneAndDelete({shortCode});
+        
+        //2. Not found 
+        if(!deletedUrl){
+            return res.status(404).json({
+                error:"Short Url not found"
+            });
+        }
+
+        //3. success no content
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({
+            error:"Internal server error"
+        });
+    }
+});
+
+//GET /shorten/:shortCode/stats
+router.get("/shorten/:shortCode/stats", async(req,res)=>{
+    try {
+        const {shortCode} = req.params;
+        const urlData = await Url.findOne({shortCode});
+
+        if(!urlData){
+            return res.status(404).json({
+                error: "Short URL not found"
+            });
+        }
+
+        res.status(200).json({
+            id: urlData._id,
+            url: urlData.url,
+            shortCode: urlData.shortCode,
+            createdAt: urlData.createdAt,
+            updatedAt: urlData.updatedAt,
+            accessCount: urlData.accessCount
+        });
+    } catch (error) {
+        res.status(500).json({
+            error:"Internal server error"
+        });
+    }
+});
+
+
 module.exports = router;
