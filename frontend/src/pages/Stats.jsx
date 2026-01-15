@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function Stats() {
   const [input, setInput] = useState("");
   const [stats, setStats] = useState(null);
@@ -7,7 +9,6 @@ function Stats() {
   const [error, setError] = useState("");
 
   const extractShortCode = (value) => {
-    // If full URL is pasted, extract last part
     try {
       if (value.includes("/")) {
         return value.split("/").pop();
@@ -29,7 +30,7 @@ function Stats() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/shorten/${shortCode}/stats`
+        `${BASE_URL}/shorten/${shortCode}/stats`
       );
 
       if (!response.ok) {
@@ -55,7 +56,7 @@ function Stats() {
           placeholder="Enter short code or short URL"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="input"
+          className={`input ${error ? "error-input" : ""}`}
         />
 
         <button className="button" onClick={handleGetStats} disabled={loading}>
@@ -64,14 +65,19 @@ function Stats() {
 
         {error && <div className="error">{error}</div>}
 
-
         {stats && (
           <div className="result">
             <p><strong>Original URL:</strong> {stats.url}</p>
             <p><strong>Short Code:</strong> {stats.shortCode}</p>
             <p><strong>Access Count:</strong> {stats.accessCount}</p>
-            <p><strong>Created At:</strong> {new Date(stats.createdAt).toLocaleString()}</p>
-            <p><strong>Updated At:</strong> {new Date(stats.updatedAt).toLocaleString()}</p>
+            <p>
+              <strong>Created At:</strong>{" "}
+              {new Date(stats.createdAt).toLocaleString()}
+            </p>
+            <p>
+              <strong>Updated At:</strong>{" "}
+              {new Date(stats.updatedAt).toLocaleString()}
+            </p>
           </div>
         )}
       </div>

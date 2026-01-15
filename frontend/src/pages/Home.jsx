@@ -6,6 +6,7 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const handleShorten = async () => {
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -20,7 +21,7 @@ function Home() {
     setShortUrl("");
 
     try {
-      const response = await fetch("http://localhost:3000/shorten", {
+      const response = await fetch(`${BASE_URL}/shorten`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -34,7 +35,7 @@ function Home() {
 
       const data = await response.json();
 
-      const fullShortUrl = `http://localhost:3000/${data.shortCode}`;
+      const fullShortUrl = `${BASE_URL}/${data.shortCode}${data.shortCode}`;
       setShortUrl(fullShortUrl);
     } catch (err) {
       setError("Something went wrong. Try again.");
