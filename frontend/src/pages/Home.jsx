@@ -21,6 +21,8 @@ function Home() {
     setShortUrl("");
 
     try {
+        console.log("BASE_URL =", BASE_URL);
+
       const response = await fetch(`${BASE_URL}/shorten`, {
         method: "POST",
         headers: {
